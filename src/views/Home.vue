@@ -8,6 +8,9 @@
           </div>
           <div class="header-right">
             <div class="user-info">
+              <el-avatar :size="38" :src="userStore.user?.avatar" class="user-avatar">
+                <el-icon><UserFilled /></el-icon>
+              </el-avatar>
               <span class="user-name">{{ userStore.user?.realName || userStore.user?.username }}</span>
               <el-tag size="small" :type="getRoleTagType()">{{ getRoleName() }}</el-tag>
             </div>
@@ -35,7 +38,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { House, Money, Tools, Bell, User, Avatar } from '@element-plus/icons-vue'
+import { House, Money, Tools, Bell, User, Avatar, UserFilled } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/modules/user'
 
 const router = useRouter()
@@ -58,6 +61,7 @@ const ownerMenu: MenuItem[] = [
 
 const propertyManagerMenu: MenuItem[] = [
   { path: '/', label: '仪表板', icon: House },
+  { path: '/user', label: '业主管理', icon: User },
   { path: '/property', label: '房产资源', icon: House },
   { path: '/bill', label: '费用管理', icon: Money },
   { path: '/repair', label: '报修工单', icon: Tools },
@@ -68,7 +72,7 @@ const propertyManagerMenu: MenuItem[] = [
 const systemAdminMenu: MenuItem[] = [
   { path: '/', label: '仪表板', icon: House },
   { path: '/announcement', label: '公告管理', icon: Bell },
-  { path: '/user', label: '用户管理', icon: User },
+  { path: '/user', label: '管理员与配置', icon: User },
   { path: '/profile', label: '个人中心', icon: Avatar }
 ]
 
@@ -107,6 +111,53 @@ const getRoleTagType = () => {
 </script>
 
 <style scoped>
+.home {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(64, 158, 255, 0.14), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(103, 194, 58, 0.12), transparent 24%),
+    linear-gradient(180deg, #f4f8fc 0%, #eef3f8 100%);
+}
+
+.home :deep(.el-container) {
+  background: transparent;
+}
+
+.home :deep(.el-header) {
+  height: 72px;
+  background: rgba(255, 255, 255, 0.84);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.home :deep(.el-aside) {
+  padding: 20px 14px;
+  background: transparent;
+}
+
+.home :deep(.el-main) {
+  padding: 20px 24px 28px;
+}
+
+.home :deep(.el-menu) {
+  border-right: none;
+  border-radius: 20px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+}
+
+.home :deep(.el-menu-item) {
+  height: 46px;
+  margin-bottom: 6px;
+  border-radius: 12px;
+}
+
+.home :deep(.el-menu-item.is-active) {
+  background: linear-gradient(135deg, #409eff, #67c23a);
+  color: #fff;
+}
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -117,7 +168,9 @@ const getRoleTagType = () => {
 
 .header-left h2 {
   margin: 0;
-  color: #409eff;
+  color: #12324a;
+  font-size: 24px;
+  letter-spacing: 0.04em;
 }
 
 .header-right {
@@ -132,8 +185,40 @@ const getRoleTagType = () => {
   gap: 10px;
 }
 
+.user-avatar {
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #409eff, #67c23a);
+  color: #fff;
+}
+
 .user-name {
   font-weight: 500;
   color: #333;
+}
+
+@media (max-width: 960px) {
+  .home :deep(.el-container) {
+    flex-direction: column;
+  }
+
+  .home :deep(.el-aside) {
+    width: 100% !important;
+    padding: 12px 20px 0;
+  }
+
+  .home :deep(.el-menu) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .home :deep(.el-menu-item) {
+    flex: 1 1 calc(50% - 8px);
+    margin-bottom: 0;
+  }
+
+  .header {
+    padding: 0 8px;
+  }
 }
 </style>

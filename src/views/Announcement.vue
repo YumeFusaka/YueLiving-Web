@@ -92,7 +92,7 @@ const rules = {
 
 const loadAnnouncements = async () => {
   const res = await getAnnouncements()
-  if (res.code === 1) {
+  if (res.code === 200) {
     announcements.value = res.data
   }
 }

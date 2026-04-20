@@ -169,7 +169,7 @@ const loadBills = async () => {
     } else {
       res = await getMyBills()
     }
-    if (res.code === 1) {
+    if (res.code === 200) {
       bills.value = res.data
     }
   } catch (error) {
@@ -179,7 +179,7 @@ const loadBills = async () => {
 
 const loadProperties = async () => {
   const res = await getAllProperties()
-  if (res.code === 1) {
+  if (res.code === 200) {
     properties.value = res.data
   }
 }
@@ -283,5 +283,15 @@ onMounted(() => {
 
 .filter-form {
   margin-bottom: 20px;
+}
+
+.filter-form :deep(.el-select) {
+  width: 180px;
+}
+
+.bill :deep(.el-dialog .el-select),
+.bill :deep(.el-dialog .el-date-editor) {
+  width: 100%;
+  min-width: 220px;
 }
 </style>

@@ -11,9 +11,10 @@
     <el-form :inline="true" class="filter-form" v-if="userStore.isPropertyManager() || userStore.isSystemAdmin()">
       <el-form-item label="状态">
         <el-select v-model="filterForm.status" placeholder="请选择状态" clearable>
-          <el-option label="待处理" :value="0"></el-option>
-          <el-option label="处理中" :value="1"></el-option>
-          <el-option label="已完成" :value="2"></el-option>
+          <el-option label="待受理" :value="0"></el-option>
+          <el-option label="已受理" :value="1"></el-option>
+          <el-option label="处理中" :value="2"></el-option>
+          <el-option label="已完成" :value="3"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -45,7 +46,7 @@
         <template #default="scope">
           <!-- 业主操作 -->
           <el-button
-            v-if="userStore.isOwner() && scope.row.status === 2 && !scope.row.rating"
+            v-if="userStore.isOwner() && scope.row.status === 3 && !scope.row.rating"
             size="small"
             type="success"
             @click="showRatingDialog(scope.row)"
@@ -64,7 +65,7 @@
               分配
             </el-button>
             <el-button
-              v-if="scope.row.status === 1"
+              v-if="scope.row.status === 1 || scope.row.status === 2"
               size="small"
               type="success"
               @click="completeRepairItem(scope.row)"
@@ -203,7 +204,7 @@ const loadRepairs = async () => {
     } else {
       res = await getMyRepairs()
     }
-    if (res.code === 1) {
+    if (res.code === 200) {
       repairs.value = res.data
     }
   } catch (error) {
@@ -213,7 +214,7 @@ const loadRepairs = async () => {
 
 const loadMaintenanceUsers = async () => {
   const res = await getMaintenanceUsers()
-  if (res.code === 1) {
+  if (res.code === 200) {
     maintenanceUsers.value = res.data
   }
 }
@@ -222,7 +223,7 @@ const submitRepair = async () => {
   try {
     await formRef.value.validate()
     const res = await addRepair(repairForm)
-    if (res.code === 1) {
+    if (res.code === 200) {
       ElMessage.success('提交成功')
       showAddDialog.value = false
       repairForm.description = ''
@@ -238,7 +239,7 @@ const submitRepair = async () => {
 }
 
 const handleUploadSuccess = (response: any, file: any) => {
-  if (response.code === 1) {
+  if (response.code === 200) {
     repairForm.images.push(response.data.url)
   } else {
     ElMessage.error('上传失败')
@@ -264,7 +265,7 @@ const submitAssign = async () => {
     await assignFormRef.value.validate()
     if (assignForm.repairId == null || assignForm.assignUserId == null) return
     const res = await assignRepair(assignForm.repairId, assignForm.assignUserId)
-    if (res.code === 1) {
+    if (res.code === 200) {
       ElMessage.success('分配成功')
       assignDialogVisible.value = false
       loadRepairs()
@@ -279,7 +280,7 @@ const submitAssign = async () => {
 const completeRepairItem = async (repair: RepairItem) => {
   try {
     const res = await completeRepair(repair.id)
-    if (res.code === 1) {
+    if (res.code === 200) {
       ElMessage.success('工单已完成')
       loadRepairs()
     } else {
@@ -302,7 +303,7 @@ const submitRating = async () => {
     await ratingFormRef.value.validate()
     if (ratingForm.repairId == null) return
     const res = await rateRepair(ratingForm.repairId, ratingForm.rating, ratingForm.comment)
-    if (res.code === 1) {
+    if (res.code === 200) {
       ElMessage.success('评价成功')
       ratingDialogVisible.value = false
       loadRepairs()
@@ -320,15 +321,16 @@ const viewDetail = (_repair: RepairItem) => {
 }
 
 const getStatusText = (status: number) => {
-  const statusMap: Record<number, string> = { 0: '待处理', 1: '处理中', 2: '已完成' }
+  const statusMap: Record<number, string> = { 0: '待受理', 1: '已受理', 2: '处理中', 3: '已完成' }
   return statusMap[status] || '未知'
 }
 
 const getStatusType = (status: number) => {
-  const typeMap: Record<number, '' | 'warning' | 'primary' | 'success'> = {
+  const typeMap: Record<number, '' | 'warning' | 'info' | 'primary' | 'success'> = {
     0: 'warning',
-    1: 'primary',
-    2: 'success'
+    1: 'info',
+    2: 'primary',
+    3: 'success'
   }
   return typeMap[status] || ''
 }
@@ -355,5 +357,14 @@ onMounted(() => {
 
 .filter-form {
   margin-bottom: 20px;
+}
+
+.filter-form :deep(.el-select) {
+  width: 180px;
+}
+
+.repair :deep(.el-dialog .el-select) {
+  width: 100%;
+  min-width: 220px;
 }
 </style>

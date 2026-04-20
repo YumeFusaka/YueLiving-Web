@@ -104,14 +104,14 @@ const passwordRules = {
 
 onMounted(async () => {
   const res = await getUserProfile()
-  if (res.code === 1) {
+  if (res.code === 200) {
     Object.assign(user, res.data)
   }
 })
 
 const updateProfile = async () => {
   const res = await updateUserProfile(user)
-  if (res.code === 1) {
+  if (res.code === 200) {
     ElMessage.success('更新成功')
   } else {
     ElMessage.error(res.message)
@@ -125,7 +125,7 @@ const handleUpdatePassword = async () => {
       oldPassword: passwordForm.oldPassword,
       newPassword: passwordForm.newPassword
     })
-    if (res.code === 1) {
+    if (res.code === 200) {
       ElMessage.success('密码修改成功')
       passwordForm.oldPassword = ''
       passwordForm.newPassword = ''
@@ -139,7 +139,7 @@ const handleUpdatePassword = async () => {
 }
 
 const handleAvatarSuccess = (response: any, file: any) => {
-  if (response.code === 1) {
+  if (response.code === 200) {
     user.avatar = response.data.url
     ElMessage.success('头像上传成功')
   } else {

@@ -62,6 +62,14 @@ export const updateUser = (data: Partial<UserItem>) => {
   }).then(res => res.data as ApiResponse<null>)
 }
 
+export const updateUserStatus = (data: { userId: number; status: number }) => {
+  return request({
+    url: '/user/status',
+    method: 'PUT',
+    data
+  }).then(res => res.data as ApiResponse<null>)
+}
+
 export const deleteUser = (id: number) => {
   return request({
     url: `/user/${id}`,

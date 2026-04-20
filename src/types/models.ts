@@ -18,6 +18,7 @@ export interface PropertyItem {
 export interface AnnouncementItem {
   id: number
   title: string
+  summary?: string
   content: string
   isTop: number
   publishUserId?: number | null

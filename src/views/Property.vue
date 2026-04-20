@@ -93,7 +93,7 @@ const rules = {
 
 const loadProperties = async () => {
   const res = await getMyProperties()
-  if (res.code === 1) {
+  if (res.code === 200) {
     properties.value = res.data
   }
 }
@@ -164,5 +164,10 @@ onMounted(() => {
 <style scoped>
 .property {
   padding: 20px;
+}
+
+.property :deep(.el-dialog .el-select) {
+  width: 100%;
+  min-width: 220px;
 }
 </style>
