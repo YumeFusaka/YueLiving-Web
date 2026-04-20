@@ -70,15 +70,16 @@ import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getAnnouncements, addAnnouncement, updateAnnouncement, deleteAnnouncement } from '@/apis/announcement'
 import { useUserStore } from '@/stores/modules/user'
+import type { AnnouncementItem } from '@/types/models'
 
 const userStore = useUserStore()
-const announcements = ref([])
+const announcements = ref<AnnouncementItem[]>([])
 const dialogVisible = ref(false)
 const isEdit = ref(false)
 const formRef = ref()
 
 const announcementForm = reactive({
-  id: null,
+  id: null as number | null,
   title: '',
   content: '',
   isTop: 0
@@ -107,7 +108,7 @@ const showAddDialog = () => {
   dialogVisible.value = true
 }
 
-const editAnnouncement = (announcement: any) => {
+const editAnnouncement = (announcement: AnnouncementItem) => {
   isEdit.value = true
   Object.assign(announcementForm, announcement)
   dialogVisible.value = true
@@ -116,11 +117,15 @@ const editAnnouncement = (announcement: any) => {
 const submitAnnouncement = async () => {
   try {
     await formRef.value.validate()
+    const payload = {
+      ...announcementForm,
+      id: announcementForm.id ?? undefined
+    }
     if (isEdit.value) {
-      await updateAnnouncement(announcementForm)
+      await updateAnnouncement(payload)
       ElMessage.success('更新成功')
     } else {
-      await addAnnouncement(announcementForm)
+      await addAnnouncement(payload)
       ElMessage.success('发布成功')
     }
     dialogVisible.value = false
@@ -130,7 +135,7 @@ const submitAnnouncement = async () => {
   }
 }
 
-const deleteAnnouncementItem = async (announcement: any) => {
+const deleteAnnouncementItem = async (announcement: AnnouncementItem) => {
   try {
     await ElMessageBox.confirm('确定删除此公告吗？', '提示', {
       confirmButtonText: '确定',
@@ -145,7 +150,7 @@ const deleteAnnouncementItem = async (announcement: any) => {
   }
 }
 
-const formatDate = (dateString: string) => {
+const formatDate = (dateString?: string) => {
   if (!dateString) return ''
   const date = new Date(dateString)
   return date.toLocaleString('zh-CN')

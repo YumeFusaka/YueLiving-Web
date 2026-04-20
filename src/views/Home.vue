@@ -18,37 +18,9 @@
       <el-container>
         <el-aside width="200px">
           <el-menu :default-active="$route.path" router>
-            <!-- 仪表板 -->
-            <el-menu-item index="/">
-              <el-icon><House /></el-icon>
-              <span>仪表板</span>
-            </el-menu-item>
-            <!-- 业主可见 -->
-            <el-menu-item v-if="userStore.isOwner() || userStore.isPropertyManager() || userStore.isSystemAdmin()" index="/property">
-              <el-icon><House /></el-icon>
-              <span>房产管理</span>
-            </el-menu-item>
-            <el-menu-item v-if="userStore.isOwner() || userStore.isPropertyManager() || userStore.isSystemAdmin()" index="/bill">
-              <el-icon><Money /></el-icon>
-              <span>费用管理</span>
-            </el-menu-item>
-            <el-menu-item v-if="userStore.isOwner() || userStore.isPropertyManager() || userStore.isSystemAdmin()" index="/repair">
-              <el-icon><Tools /></el-icon>
-              <span>报修管理</span>
-            </el-menu-item>
-            <!-- 物业经理和管理员可见 -->
-            <el-menu-item v-if="userStore.isPropertyManager() || userStore.isSystemAdmin()" index="/announcement">
-              <el-icon><Bell /></el-icon>
-              <span>公告管理</span>
-            </el-menu-item>
-            <el-menu-item v-if="userStore.isSystemAdmin()" index="/user">
-              <el-icon><User /></el-icon>
-              <span>用户管理</span>
-            </el-menu-item>
-            <!-- 所有登录用户可见 -->
-            <el-menu-item index="/profile">
-              <el-icon><Avatar /></el-icon>
-              <span>个人中心</span>
+            <el-menu-item v-for="item in menuItems" :key="item.path" :index="item.path">
+              <el-icon><component :is="item.icon" /></el-icon>
+              <span>{{ item.label }}</span>
             </el-menu-item>
           </el-menu>
         </el-aside>
@@ -61,12 +33,54 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { House, Money, Tools, Bell, User, Avatar } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/modules/user'
 
 const router = useRouter()
 const userStore = useUserStore()
+
+type MenuItem = {
+  path: string
+  label: string
+  icon: typeof House
+}
+
+const ownerMenu: MenuItem[] = [
+  { path: '/', label: '仪表板', icon: House },
+  { path: '/property', label: '我的房产', icon: House },
+  { path: '/bill', label: '费用中心', icon: Money },
+  { path: '/repair', label: '在线报修', icon: Tools },
+  { path: '/announcement', label: '公告通知', icon: Bell },
+  { path: '/profile', label: '个人中心', icon: Avatar }
+]
+
+const propertyManagerMenu: MenuItem[] = [
+  { path: '/', label: '仪表板', icon: House },
+  { path: '/property', label: '房产资源', icon: House },
+  { path: '/bill', label: '费用管理', icon: Money },
+  { path: '/repair', label: '报修工单', icon: Tools },
+  { path: '/announcement', label: '公告管理', icon: Bell },
+  { path: '/profile', label: '个人中心', icon: Avatar }
+]
+
+const systemAdminMenu: MenuItem[] = [
+  { path: '/', label: '仪表板', icon: House },
+  { path: '/announcement', label: '公告管理', icon: Bell },
+  { path: '/user', label: '用户管理', icon: User },
+  { path: '/profile', label: '个人中心', icon: Avatar }
+]
+
+const menuItems = computed(() => {
+  if (userStore.isSystemAdmin()) {
+    return systemAdminMenu
+  }
+  if (userStore.isPropertyManager()) {
+    return propertyManagerMenu
+  }
+  return ownerMenu
+})
 
 const logout = () => {
   userStore.logout()
@@ -75,13 +89,19 @@ const logout = () => {
 
 const getRoleName = () => {
   const roleId = userStore.getRoleId()
-  const roles = { 1: '业主', 2: '物业管理员', 3: '系统管理员' }
+  const roles: Record<number, string> = { 1: '业主', 2: '物业管理员', 3: '系统管理员' }
+  if (roleId == null) return '未知角色'
   return roles[roleId] || '未知角色'
 }
 
 const getRoleTagType = () => {
   const roleId = userStore.getRoleId()
-  const tagTypes = { 1: 'success', 2: 'primary', 3: 'danger' }
+  const tagTypes: Record<number, '' | 'success' | 'primary' | 'danger'> = {
+    1: 'success',
+    2: 'primary',
+    3: 'danger'
+  }
+  if (roleId == null) return ''
   return tagTypes[roleId] || ''
 }
 </script>

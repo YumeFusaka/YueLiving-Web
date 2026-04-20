@@ -76,16 +76,15 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getUsers, addUser, updateUser, deleteUser } from '@/apis/user'
-import { useUserStore } from '@/stores/modules/user'
+import type { UserItem } from '@/types/models'
 
-const userStore = useUserStore()
-const users = ref([])
+const users = ref<UserItem[]>([])
 const dialogVisible = ref(false)
 const isEdit = ref(false)
 const formRef = ref()
 
 const userForm = reactive({
-  id: null,
+  id: null as number | null,
   username: '',
   password: '',
   realName: '',
@@ -104,7 +103,7 @@ const rules = {
 }
 
 const getRoleName = (roleId: number) => {
-  const roles = { 1: '业主', 2: '物业管理员', 3: '系统管理员' }
+  const roles: Record<number, string> = { 1: '业主', 2: '物业管理员', 3: '系统管理员' }
   return roles[roleId] || '未知'
 }
 
@@ -139,11 +138,15 @@ const editUser = (user: any) => {
 const submitUser = async () => {
   try {
     await formRef.value.validate()
+    const payload = {
+      ...userForm,
+      id: userForm.id ?? undefined
+    }
     if (isEdit.value) {
-      await updateUser(userForm)
+      await updateUser(payload)
       ElMessage.success('更新成功')
     } else {
-      await addUser(userForm)
+      await addUser(payload)
       ElMessage.success('添加成功')
     }
     dialogVisible.value = false

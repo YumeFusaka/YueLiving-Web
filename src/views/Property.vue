@@ -65,20 +65,21 @@ import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getMyProperties, addProperty, updateProperty, deleteProperty } from '@/apis/property'
 import { useUserStore } from '@/stores/modules/user'
+import type { PropertyItem } from '@/types/models'
 
 const userStore = useUserStore()
-const properties = ref([])
+const properties = ref<PropertyItem[]>([])
 const dialogVisible = ref(false)
 const isEdit = ref(false)
 const formRef = ref()
 
 const propertyForm = reactive({
-  id: null,
+  id: null as number | null,
   buildingNo: '',
   unitNo: '',
   roomNo: '',
-  area: null,
-  ownerId: null,
+  area: null as number | null,
+  ownerId: null as number | null,
   status: 1
 })
 
@@ -111,7 +112,7 @@ const showAddDialog = () => {
   dialogVisible.value = true
 }
 
-const editProperty = (property: any) => {
+const editProperty = (property: PropertyItem) => {
   isEdit.value = true
   Object.assign(propertyForm, property)
   dialogVisible.value = true
@@ -120,11 +121,17 @@ const editProperty = (property: any) => {
 const submitProperty = async () => {
   try {
     await formRef.value.validate()
+    const payload = {
+      ...propertyForm,
+      id: propertyForm.id ?? undefined,
+      area: propertyForm.area ?? undefined,
+      ownerId: propertyForm.ownerId ?? undefined
+    }
     if (isEdit.value) {
-      await updateProperty(propertyForm)
+      await updateProperty(payload)
       ElMessage.success('更新成功')
     } else {
-      await addProperty(propertyForm)
+      await addProperty(payload)
       ElMessage.success('添加成功')
     }
     dialogVisible.value = false
@@ -134,7 +141,7 @@ const submitProperty = async () => {
   }
 }
 
-const deletePropertyItem = async (property: any) => {
+const deletePropertyItem = async (property: PropertyItem) => {
   try {
     await ElMessageBox.confirm('确定删除此房产吗？', '提示', {
       confirmButtonText: '确定',

@@ -2,8 +2,8 @@
   <div class="login-container">
     <el-form :model="form" :rules="rules" ref="formRef" label-width="80px" class="login-form">
       <h2>悦居管家登录</h2>
-      <el-form-item label="用户名" prop="username">
-        <el-input v-model="form.username" placeholder="请输入用户名"></el-input>
+      <el-form-item label="账号" prop="account">
+        <el-input v-model="form.account" placeholder="请输入用户名或手机号"></el-input>
       </el-form-item>
       <el-form-item label="密码" prop="password">
         <el-input v-model="form.password" type="password" placeholder="请输入密码"></el-input>
@@ -20,7 +20,7 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { login } from '@/apis/test'
+import { login } from '@/apis/user'
 import { useUserStore } from '@/stores/modules/user'
 
 const router = useRouter()
@@ -29,12 +29,12 @@ const formRef = ref()
 const loading = ref(false)
 
 const form = reactive({
-  username: '',
+  account: '',
   password: ''
 })
 
 const rules = {
-  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+  account: [{ required: true, message: '请输入用户名或手机号', trigger: 'blur' }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
 }
 
@@ -42,7 +42,7 @@ const handleLogin = async () => {
   try {
     await formRef.value.validate()
     loading.value = true
-    const res = await login(form)
+    const res = await login({ username: form.account, password: form.password })
     if (res.code === 200) {
       userStore.setToken(res.data.token)
       userStore.setUser(res.data.user)

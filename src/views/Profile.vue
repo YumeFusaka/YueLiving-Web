@@ -47,7 +47,7 @@
             <el-input v-model="passwordForm.confirmPassword" type="password"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="updatePassword">修改密码</el-button>
+            <el-button type="primary" @click="handleUpdatePassword">修改密码</el-button>
           </el-form-item>
         </el-form>
       </el-tab-pane>
@@ -59,18 +59,20 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
-import { getUserProfile, updateUserProfile, updatePassword } from '@/apis/user'
+import { getUserProfile, updateUserProfile, updatePassword as updateUserPassword } from '@/apis/user'
 import { useUserStore } from '@/stores/modules/user'
+import type { UserItem } from '@/types/models'
 
 const activeTab = ref('info')
 const passwordFormRef = ref()
 const userStore = useUserStore()
 
-const user = reactive({
+const user = reactive<Partial<UserItem>>({
   username: '',
   realName: '',
   phone: '',
-  email: ''
+  email: '',
+  avatar: ''
 })
 
 const passwordForm = reactive({
@@ -116,10 +118,13 @@ const updateProfile = async () => {
   }
 }
 
-const updatePassword = async () => {
+const handleUpdatePassword = async () => {
   try {
     await passwordFormRef.value.validate()
-    const res = await updatePassword(passwordForm)
+    const res = await updateUserPassword({
+      oldPassword: passwordForm.oldPassword,
+      newPassword: passwordForm.newPassword
+    })
     if (res.code === 1) {
       ElMessage.success('密码修改成功')
       passwordForm.oldPassword = ''

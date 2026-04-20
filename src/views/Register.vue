@@ -14,11 +14,11 @@
       <el-form-item label="邮箱" prop="email">
         <el-input v-model="form.email" placeholder="请输入邮箱"></el-input>
       </el-form-item>
-      <el-form-item label="角色" prop="roleId">
-        <el-select v-model="form.roleId" placeholder="请选择角色">
-          <el-option label="业主" :value="1"></el-option>
-          <el-option label="物业管理员" :value="2"></el-option>
-        </el-select>
+      <el-form-item label="姓名" prop="realName">
+        <el-input v-model="form.realName" placeholder="请输入真实姓名"></el-input>
+      </el-form-item>
+      <el-form-item label="身份">
+        <el-input value="业主" disabled></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="handleRegister" :loading="loading">注册</el-button>

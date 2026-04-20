@@ -17,6 +17,10 @@ export interface User {
 export const useUserStore = defineStore(
   'user',
   () => {
+    const OWNER_ROLE_ID = 1
+    const PROPERTY_MANAGER_ROLE_ID = 2
+    const SYSTEM_ADMIN_ROLE_ID = 3
+
     const token = ref<string>()
     const user = ref<User>()
 
@@ -49,19 +53,35 @@ export const useUserStore = defineStore(
       return user.value?.roleId
     }
 
+    const hasRole = (roleId: number) => {
+      return getRoleId() === roleId
+    }
+
+    const hasAnyRole = (roleIds: number[]) => {
+      const currentRoleId = getRoleId()
+      return currentRoleId != null && roleIds.includes(currentRoleId)
+    }
+
     const isOwner = () => {
-      return getRoleId() === 1
+      return hasRole(OWNER_ROLE_ID)
     }
 
     const isPropertyManager = () => {
-      return getRoleId() === 2
+      return hasRole(PROPERTY_MANAGER_ROLE_ID)
     }
 
     const isSystemAdmin = () => {
-      return getRoleId() === 3
+      return hasRole(SYSTEM_ADMIN_ROLE_ID)
+    }
+
+    const isManagerSide = () => {
+      return hasAnyRole([PROPERTY_MANAGER_ROLE_ID, SYSTEM_ADMIN_ROLE_ID])
     }
 
     return {
+      OWNER_ROLE_ID,
+      PROPERTY_MANAGER_ROLE_ID,
+      SYSTEM_ADMIN_ROLE_ID,
       token,
       user,
       setToken,
@@ -71,9 +91,12 @@ export const useUserStore = defineStore(
       logout,
       isLoggedIn,
       getRoleId,
+      hasRole,
+      hasAnyRole,
       isOwner,
       isPropertyManager,
-      isSystemAdmin
+      isSystemAdmin,
+      isManagerSide
     }
   },
   {

@@ -150,17 +150,18 @@ import { Plus } from '@element-plus/icons-vue'
 import { getMyRepairs, getAllRepairs, addRepair, assignRepair, completeRepair, rateRepair } from '@/apis/repair'
 import { getMaintenanceUsers } from '@/apis/user'
 import { useUserStore } from '@/stores/modules/user'
+import type { RepairItem, UserItem } from '@/types/models'
 
 const userStore = useUserStore()
-const repairs = ref([])
-const maintenanceUsers = ref([])
+const repairs = ref<RepairItem[]>([])
+const maintenanceUsers = ref<UserItem[]>([])
 const showAddDialog = ref(false)
 const assignDialogVisible = ref(false)
 const ratingDialogVisible = ref(false)
 const formRef = ref()
 const assignFormRef = ref()
 const ratingFormRef = ref()
-const fileList = ref([])
+const fileList = ref<any[]>([])
 
 const filterForm = reactive({
   status: null as number | null
@@ -172,12 +173,12 @@ const repairForm = reactive({
 })
 
 const assignForm = reactive({
-  repairId: null,
-  assignUserId: null
+  repairId: null as number | null,
+  assignUserId: null as number | null
 })
 
 const ratingForm = reactive({
-  repairId: null,
+  repairId: null as number | null,
   rating: 5,
   comment: ''
 })
@@ -252,15 +253,16 @@ const handleRemove = (file: any, fileList: any[]) => {
   }
 }
 
-const assignRepairItem = (repair: any) => {
+const assignRepairItem = (repair: RepairItem) => {
   assignForm.repairId = repair.id
-  assignForm.assignUserId = repair.assignUserId
+  assignForm.assignUserId = repair.assignUserId ?? null
   assignDialogVisible.value = true
 }
 
 const submitAssign = async () => {
   try {
     await assignFormRef.value.validate()
+    if (assignForm.repairId == null || assignForm.assignUserId == null) return
     const res = await assignRepair(assignForm.repairId, assignForm.assignUserId)
     if (res.code === 1) {
       ElMessage.success('分配成功')
@@ -274,7 +276,7 @@ const submitAssign = async () => {
   }
 }
 
-const completeRepairItem = async (repair: any) => {
+const completeRepairItem = async (repair: RepairItem) => {
   try {
     const res = await completeRepair(repair.id)
     if (res.code === 1) {
@@ -288,7 +290,7 @@ const completeRepairItem = async (repair: any) => {
   }
 }
 
-const showRatingDialog = (repair: any) => {
+const showRatingDialog = (repair: RepairItem) => {
   ratingForm.repairId = repair.id
   ratingForm.rating = 5
   ratingForm.comment = ''
@@ -298,6 +300,7 @@ const showRatingDialog = (repair: any) => {
 const submitRating = async () => {
   try {
     await ratingFormRef.value.validate()
+    if (ratingForm.repairId == null) return
     const res = await rateRepair(ratingForm.repairId, ratingForm.rating, ratingForm.comment)
     if (res.code === 1) {
       ElMessage.success('评价成功')
@@ -311,18 +314,22 @@ const submitRating = async () => {
   }
 }
 
-const viewDetail = (repair: any) => {
+const viewDetail = (_repair: RepairItem) => {
   // 这里可以实现查看详情的逻辑
   ElMessage.info('详情功能待实现')
 }
 
 const getStatusText = (status: number) => {
-  const statusMap = { 0: '待处理', 1: '处理中', 2: '已完成' }
+  const statusMap: Record<number, string> = { 0: '待处理', 1: '处理中', 2: '已完成' }
   return statusMap[status] || '未知'
 }
 
 const getStatusType = (status: number) => {
-  const typeMap = { 0: 'warning', 1: 'primary', 2: 'success' }
+  const typeMap: Record<number, '' | 'warning' | 'primary' | 'success'> = {
+    0: 'warning',
+    1: 'primary',
+    2: 'success'
+  }
   return typeMap[status] || ''
 }
 

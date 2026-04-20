@@ -1,38 +1,39 @@
 import request from '@/utils/axios'
+import type { ApiResponse, PropertyItem } from '@/types/models'
 
 export const getMyProperties = () => {
   return request({
     url: '/property/my',
     method: 'GET'
-  }).then(res => res.data)
+  }).then(res => res.data as ApiResponse<PropertyItem[]>)
 }
 
 export const getAllProperties = () => {
   return request({
     url: '/property',
     method: 'GET'
-  }).then(res => res.data)
+  }).then(res => res.data as ApiResponse<PropertyItem[]>)
 }
 
-export const addProperty = (data: any) => {
+export const addProperty = (data: Partial<PropertyItem>) => {
   return request({
     url: '/property',
     method: 'POST',
     data
-  }).then(res => res.data)
+  }).then(res => res.data as ApiResponse<null>)
 }
 
-export const updateProperty = (data: any) => {
+export const updateProperty = (data: Partial<PropertyItem>) => {
   return request({
     url: '/property',
     method: 'PUT',
     data
-  }).then(res => res.data)
+  }).then(res => res.data as ApiResponse<null>)
 }
 
 export const deleteProperty = (id: number) => {
   return request({
     url: `/property/${id}`,
     method: 'DELETE'
-  }).then(res => res.data)
+  }).then(res => res.data as ApiResponse<null>)
 }

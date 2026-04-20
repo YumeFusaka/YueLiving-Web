@@ -52,7 +52,7 @@
             v-if="scope.row.status === 0 && userStore.isOwner()"
             size="small"
             type="success"
-            @click="payBill(scope.row)"
+            @click="payBillItem(scope.row)"
           >
             缴费
           </el-button>
@@ -128,10 +128,11 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { getMyBills, getAllBills, addBill, updateBill, deleteBill, payBill } from '@/apis/bill'
 import { getAllProperties } from '@/apis/property'
 import { useUserStore } from '@/stores/modules/user'
+import type { BillItem, PropertyItem } from '@/types/models'
 
 const userStore = useUserStore()
-const bills = ref([])
-const properties = ref([])
+const bills = ref<BillItem[]>([])
+const properties = ref<PropertyItem[]>([])
 const dialogVisible = ref(false)
 const isEdit = ref(false)
 const formRef = ref()
@@ -142,12 +143,12 @@ const filterForm = reactive({
 })
 
 const billForm = reactive({
-  id: null,
-  propertyId: null,
+  id: null as number | null,
+  propertyId: null as number | null,
   billType: '',
-  amount: null,
+  amount: null as number | null,
   period: '',
-  dueDate: null,
+  dueDate: null as string | Date | null,
   status: 0
 })
 
@@ -197,7 +198,7 @@ const showAddDialog = () => {
   dialogVisible.value = true
 }
 
-const editBill = (bill: any) => {
+const editBill = (bill: BillItem) => {
   isEdit.value = true
   Object.assign(billForm, bill)
   dialogVisible.value = true
@@ -206,11 +207,21 @@ const editBill = (bill: any) => {
 const submitBill = async () => {
   try {
     await formRef.value.validate()
+    const payload = {
+      ...billForm,
+      id: billForm.id ?? undefined,
+      propertyId: billForm.propertyId ?? undefined,
+      amount: billForm.amount ?? undefined,
+      dueDate:
+        typeof billForm.dueDate === 'string'
+          ? billForm.dueDate
+          : billForm.dueDate?.toISOString().slice(0, 10)
+    }
     if (isEdit.value) {
-      await updateBill(billForm)
+      await updateBill(payload)
       ElMessage.success('更新成功')
     } else {
-      await addBill(billForm)
+      await addBill(payload)
       ElMessage.success('添加成功')
     }
     dialogVisible.value = false
@@ -220,7 +231,7 @@ const submitBill = async () => {
   }
 }
 
-const deleteBillItem = async (bill: any) => {
+const deleteBillItem = async (bill: BillItem) => {
   try {
     await ElMessageBox.confirm('确定删除此账单吗？', '提示', {
       confirmButtonText: '确定',
@@ -235,7 +246,7 @@ const deleteBillItem = async (bill: any) => {
   }
 }
 
-const payBillItem = async (bill: any) => {
+const payBillItem = async (bill: BillItem) => {
   try {
     await ElMessageBox.confirm(`确定支付 ¥${bill.amount} 吗？`, '确认缴费', {
       confirmButtonText: '确定',
