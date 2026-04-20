@@ -17,7 +17,7 @@
       <el-form-item label="角色" prop="roleId">
         <el-select v-model="form.roleId" placeholder="请选择角色">
           <el-option label="业主" :value="1"></el-option>
-          <el-option label="物业经理" :value="2"></el-option>
+          <el-option label="物业管理员" :value="2"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item>

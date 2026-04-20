@@ -22,6 +22,9 @@
       <el-table-column label="操作">
         <template #default="scope">
           <el-button size="small" @click="editUser(scope.row)">编辑</el-button>
+          <el-button size="small" :type="scope.row.status === 1 ? 'warning' : 'success'" @click="toggleStatus(scope.row)">
+            {{ scope.row.status === 1 ? '禁用' : '启用' }}
+          </el-button>
           <el-button size="small" type="danger" @click="deleteUserItem(scope.row)">删除</el-button>
         </template>
       </el-table-column>
@@ -159,6 +162,17 @@ const deleteUserItem = async (user: any) => {
     })
     await deleteUser(user.id)
     ElMessage.success('删除成功')
+    loadUsers()
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+const toggleStatus = async (user: any) => {
+  try {
+    const newStatus = user.status === 1 ? 0 : 1
+    await updateUser({ ...user, status: newStatus })
+    ElMessage.success(newStatus === 1 ? '启用成功' : '禁用成功')
     loadUsers()
   } catch (error) {
     console.error(error)

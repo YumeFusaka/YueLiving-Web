@@ -31,6 +31,14 @@ export const updateUserProfile = (data: any) => {
   }).then(res => res.data)
 }
 
+export const updatePassword = (data: { oldPassword: string; newPassword: string }) => {
+  return request({
+    url: '/user/profile/password',
+    method: 'PUT',
+    data
+  }).then(res => res.data)
+}
+
 export const getUsers = () => {
   return request({
     url: '/user',

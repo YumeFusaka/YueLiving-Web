@@ -18,6 +18,11 @@
       <el-container>
         <el-aside width="200px">
           <el-menu :default-active="$route.path" router>
+            <!-- 仪表板 -->
+            <el-menu-item index="/">
+              <el-icon><House /></el-icon>
+              <span>仪表板</span>
+            </el-menu-item>
             <!-- 业主可见 -->
             <el-menu-item v-if="userStore.isOwner() || userStore.isPropertyManager() || userStore.isSystemAdmin()" index="/property">
               <el-icon><House /></el-icon>

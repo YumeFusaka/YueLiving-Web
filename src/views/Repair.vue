@@ -86,12 +86,14 @@
         <el-form-item label="上传图片" prop="images">
           <el-upload
             v-model:file-list="fileList"
-            action=""
+            action="/repair/upload"
             list-type="picture-card"
-            :auto-upload="false"
             :multiple="true"
             :limit="3"
             accept="image/*"
+            :on-success="handleUploadSuccess"
+            :on-remove="handleRemove"
+            :headers="{ Authorization: 'Bearer ' + userStore.token }"
           >
             <el-icon><Plus /></el-icon>
           </el-upload>
@@ -166,7 +168,7 @@ const filterForm = reactive({
 
 const repairForm = reactive({
   description: '',
-  images: []
+  images: [] as string[]
 })
 
 const assignForm = reactive({
@@ -223,6 +225,7 @@ const submitRepair = async () => {
       ElMessage.success('提交成功')
       showAddDialog.value = false
       repairForm.description = ''
+      repairForm.images = []
       fileList.value = []
       loadRepairs()
     } else {
@@ -230,6 +233,22 @@ const submitRepair = async () => {
     }
   } catch (error) {
     console.error(error)
+  }
+}
+
+const handleUploadSuccess = (response: any, file: any) => {
+  if (response.code === 1) {
+    repairForm.images.push(response.data.url)
+  } else {
+    ElMessage.error('上传失败')
+  }
+}
+
+const handleRemove = (file: any, fileList: any[]) => {
+  // 从 images 中移除对应的 URL
+  const index = repairForm.images.findIndex(url => url.includes(file.name))
+  if (index > -1) {
+    repairForm.images.splice(index, 1)
   }
 }
 
