@@ -8,8 +8,13 @@
       </div>
     </div>
 
+    <el-tabs v-if="userStore.isOwner()" v-model="ownerTab" class="owner-tabs">
+      <el-tab-pane label="待缴与提醒" name="pending"></el-tab-pane>
+      <el-tab-pane label="缴费历史" name="history"></el-tab-pane>
+    </el-tabs>
+
     <!-- 筛选条件 -->
-    <el-form :inline="true" class="filter-form">
+    <el-form :inline="true" class="filter-form" v-if="!userStore.isOwner()">
       <el-form-item label="账单类型">
         <el-select v-model="filterForm.billType" placeholder="请选择类型" clearable>
           <el-option label="物业费" value="物业费"></el-option>
@@ -29,7 +34,7 @@
       </el-form-item>
     </el-form>
 
-    <el-table :data="bills" style="width: 100%">
+    <el-table :data="tableBills" style="width: 100%">
       <el-table-column prop="propertyId" label="房产ID" v-if="!userStore.isOwner()"></el-table-column>
       <el-table-column prop="billType" label="账单类型"></el-table-column>
       <el-table-column prop="amount" label="金额(元)">
@@ -136,7 +141,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { computed, ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getMyBills, getAllBills, addBill, updateBill, deleteBill, payBill, generateBills } from '@/apis/bill'
 import { getAllProperties } from '@/apis/property'
@@ -146,6 +151,7 @@ import type { BillItem, PropertyItem } from '@/types/models'
 const userStore = useUserStore()
 const bills = ref<BillItem[]>([])
 const properties = ref<PropertyItem[]>([])
+const ownerTab = ref<'pending' | 'history'>('pending')
 const dialogVisible = ref(false)
 const generateBillDialogVisible = ref(false)
 const isEdit = ref(false)
@@ -175,6 +181,16 @@ const rules = {
   dueDate: [{ required: true, message: '请选择到期日期', trigger: 'change' }],
   status: [{ required: true, message: '请选择状态', trigger: 'change' }]
 }
+
+const tableBills = computed(() => {
+  if (!userStore.isOwner()) {
+    return bills.value
+  }
+  if (ownerTab.value === 'history') {
+    return bills.value.filter(bill => bill.status === 1)
+  }
+  return bills.value.filter(bill => bill.status !== 1)
+})
 
 const loadBills = async () => {
   try {
@@ -305,6 +321,10 @@ onMounted(() => {
 
 .filter-form {
   margin-bottom: 20px;
+}
+
+.owner-tabs {
+  margin-bottom: 12px;
 }
 
 .filter-form :deep(.el-select) {

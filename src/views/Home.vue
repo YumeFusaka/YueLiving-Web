@@ -66,6 +66,7 @@ const propertyManagerMenu: MenuItem[] = [
   { path: '/bill', label: '费用管理', icon: Money },
   { path: '/repair', label: '报修工单', icon: Tools },
   { path: '/announcement', label: '公告管理', icon: Bell },
+  { path: '/operation-logs', label: '操作记录', icon: Avatar },
   { path: '/profile', label: '个人中心', icon: Avatar }
 ]
 
@@ -73,6 +74,7 @@ const systemAdminMenu: MenuItem[] = [
   { path: '/', label: '仪表板', icon: House },
   { path: '/announcement', label: '公告管理', icon: Bell },
   { path: '/user', label: '管理员与配置', icon: User },
+  { path: '/operation-logs', label: '操作记录', icon: Avatar },
   { path: '/profile', label: '个人中心', icon: Avatar }
 ]
 

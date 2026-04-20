@@ -51,29 +51,6 @@
           </el-form-item>
         </el-form>
       </el-tab-pane>
-      <el-tab-pane label="报修记录" name="repairs">
-        <el-table :data="repairs">
-          <el-table-column prop="description" label="故障描述" min-width="220" />
-          <el-table-column prop="status" label="状态" />
-          <el-table-column prop="createTime" label="提交时间" />
-        </el-table>
-      </el-tab-pane>
-      <el-tab-pane label="缴费历史" name="bills">
-        <el-table :data="bills">
-          <el-table-column prop="billItemName" label="账单名称" min-width="180" />
-          <el-table-column prop="amount" label="金额" />
-          <el-table-column prop="status" label="状态" />
-          <el-table-column prop="payTime" label="缴费时间" />
-        </el-table>
-      </el-tab-pane>
-      <el-tab-pane label="操作记录" name="logs">
-        <el-table :data="logs">
-          <el-table-column prop="moduleName" label="模块" width="120" />
-          <el-table-column prop="actionName" label="操作" width="120" />
-          <el-table-column prop="content" label="内容" min-width="240" />
-          <el-table-column prop="createTime" label="时间" width="180" />
-        </el-table>
-      </el-tab-pane>
     </el-tabs>
   </div>
 </template>
@@ -82,18 +59,13 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
-import { getMyLogs, getUserProfile, updateUserProfile, updatePassword as updateUserPassword } from '@/apis/user'
-import { getMyRepairs } from '@/apis/repair'
-import { getMyBills } from '@/apis/bill'
+import { getUserProfile, updateUserProfile, updatePassword as updateUserPassword } from '@/apis/user'
 import { useUserStore } from '@/stores/modules/user'
-import type { BillItem, OperationLogItem, RepairItem, UserItem } from '@/types/models'
+import type { UserItem } from '@/types/models'
 
 const activeTab = ref('info')
 const passwordFormRef = ref()
 const userStore = useUserStore()
-const repairs = ref<RepairItem[]>([])
-const bills = ref<BillItem[]>([])
-const logs = ref<OperationLogItem[]>([])
 
 const user = reactive<Partial<UserItem>>({
   username: '',
@@ -131,23 +103,9 @@ const passwordRules = {
 }
 
 onMounted(async () => {
-  const [profileRes, repairRes, billRes, logRes] = await Promise.all([
-    getUserProfile(),
-    getMyRepairs(),
-    getMyBills(),
-    getMyLogs()
-  ])
+  const profileRes = await getUserProfile()
   if (profileRes.code === 200) {
     Object.assign(user, profileRes.data)
-  }
-  if (repairRes.code === 200) {
-    repairs.value = repairRes.data
-  }
-  if (billRes.code === 200) {
-    bills.value = billRes.data
-  }
-  if (logRes.code === 200) {
-    logs.value = logRes.data
   }
 })
 

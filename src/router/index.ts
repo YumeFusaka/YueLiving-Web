@@ -58,6 +58,12 @@ const router = createRouter({
           meta: { requiresAuth: true } satisfies AppRouteMeta
         },
         {
+          path: '/operation-logs',
+          name: 'OperationLogs',
+          component: () => import('@/views/OperationLogs.vue'),
+          meta: { requiresAuth: true, roles: [2, 3] } satisfies AppRouteMeta
+        },
+        {
           path: '/profile',
           name: 'Profile',
           component: () => import('@/views/Profile.vue'),

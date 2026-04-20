@@ -1,11 +1,24 @@
 <template>
   <div class="repair">
     <div class="header">
-      <h3>{{ userStore.isOwner() ? '我的报修' : '报修管理' }}</h3>
+      <h3>{{ userStore.isOwner() ? '在线报修' : '报修管理' }}</h3>
       <div v-if="userStore.isOwner()">
         <el-button type="primary" @click="showAddDialog = true">提交报修</el-button>
       </div>
     </div>
+
+    <el-tabs v-if="userStore.isOwner()" v-model="ownerTab" class="owner-tabs">
+      <el-tab-pane label="提交报修" name="submit"></el-tab-pane>
+      <el-tab-pane label="我的报修" name="records"></el-tab-pane>
+    </el-tabs>
+
+    <el-alert
+      v-if="userStore.isOwner() && ownerTab === 'submit'"
+      title="在这里提交新的报修申请，提交后可切换到“我的报修”查看处理进度和评价。"
+      type="info"
+      :closable="false"
+      class="owner-alert"
+    />
 
     <!-- 筛选条件 -->
     <el-form :inline="true" class="filter-form" v-if="userStore.isPropertyManager() || userStore.isSystemAdmin()">
@@ -22,7 +35,7 @@
       </el-form-item>
     </el-form>
 
-    <el-table :data="repairs" style="width: 100%">
+    <el-table v-if="!userStore.isOwner() || ownerTab === 'records'" :data="repairs" style="width: 100%">
       <el-table-column prop="id" label="工单号" width="100"></el-table-column>
       <el-table-column prop="propertyId" label="房产ID" v-if="!userStore.isOwner()"></el-table-column>
       <el-table-column prop="userId" label="报修人ID" v-if="!userStore.isOwner()"></el-table-column>
@@ -156,6 +169,7 @@ import type { RepairItem, UserItem } from '@/types/models'
 const userStore = useUserStore()
 const repairs = ref<RepairItem[]>([])
 const maintenanceUsers = ref<UserItem[]>([])
+const ownerTab = ref<'submit' | 'records'>('records')
 const showAddDialog = ref(false)
 const assignDialogVisible = ref(false)
 const ratingDialogVisible = ref(false)
@@ -357,6 +371,14 @@ onMounted(() => {
 
 .filter-form {
   margin-bottom: 20px;
+}
+
+.owner-tabs {
+  margin-bottom: 12px;
+}
+
+.owner-alert {
+  margin-bottom: 16px;
 }
 
 .filter-form :deep(.el-select) {
