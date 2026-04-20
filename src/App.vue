@@ -1,15 +1,29 @@
 <script setup lang="ts">
-import { testAPI } from '@/apis/test'
-const test = async () => {
-  const res = await testAPI()
-  console.log(res)
-}
+import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores'
+
+const router = useRouter()
+const userStore = useUserStore()
+
+onMounted(() => {
+  if (!userStore.token && router.currentRoute.value.path !== '/login' && router.currentRoute.value.path !== '/register') {
+    router.push('/login')
+  }
+})
 </script>
 
 <template>
-  <div>
-    <button @click="test">test</button>
-  </div>
+  <router-view />
 </template>
 
-<style scoped></style>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+}
+</style>

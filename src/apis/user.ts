@@ -16,15 +16,14 @@ export const register = (data: { username: string; password: string; phone: stri
     data
   }).then(res => res.data)
 }
-
-export const getProfile = () => {
+export const getUserProfile = () => {
   return request({
     url: '/user/profile',
     method: 'GET'
   }).then(res => res.data)
 }
 
-export const updateProfile = (data: any) => {
+export const updateUserProfile = (data: any) => {
   return request({
     url: '/user/profile',
     method: 'PUT',
