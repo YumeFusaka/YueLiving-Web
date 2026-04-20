@@ -3,8 +3,16 @@
     <el-container style="height: 100vh">
       <el-header>
         <div class="header">
-          <h2>悦居管家</h2>
-          <el-button @click="logout">退出登录</el-button>
+          <div class="header-left">
+            <h2>悦居管家</h2>
+          </div>
+          <div class="header-right">
+            <div class="user-info">
+              <span class="user-name">{{ userStore.user?.realName || userStore.user?.username }}</span>
+              <el-tag size="small" :type="getRoleTagType()">{{ getRoleName() }}</el-tag>
+            </div>
+            <el-button @click="logout" size="small">退出登录</el-button>
+          </div>
         </div>
       </el-header>
       <el-container>
@@ -59,6 +67,18 @@ const logout = () => {
   userStore.logout()
   router.push('/login')
 }
+
+const getRoleName = () => {
+  const roleId = userStore.getRoleId()
+  const roles = { 1: '业主', 2: '物业管理员', 3: '系统管理员' }
+  return roles[roleId] || '未知角色'
+}
+
+const getRoleTagType = () => {
+  const roleId = userStore.getRoleId()
+  const tagTypes = { 1: 'success', 2: 'primary', 3: 'danger' }
+  return tagTypes[roleId] || ''
+}
 </script>
 
 <style scoped>
@@ -67,9 +87,28 @@ const logout = () => {
   justify-content: space-between;
   align-items: center;
   height: 100%;
+  padding: 0 20px;
 }
 
-.header h2 {
+.header-left h2 {
   margin: 0;
+  color: #409eff;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-name {
+  font-weight: 500;
+  color: #333;
 }
 </style>

@@ -23,6 +23,14 @@ export const getUserProfile = () => {
   }).then(res => res.data)
 }
 
+export const updateUserProfile = (data: any) => {
+  return request({
+    url: '/user/profile',
+    method: 'PUT',
+    data
+  }).then(res => res.data)
+}
+
 export const getUsers = () => {
   return request({
     url: '/user',
