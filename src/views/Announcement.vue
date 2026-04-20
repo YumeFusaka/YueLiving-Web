@@ -18,6 +18,7 @@
             <div class="title-section">
               <span class="title">{{ item.title }}</span>
               <el-tag v-if="item.isTop === 1" type="danger" size="small">置顶</el-tag>
+              <el-tag v-if="item.status === 'DRAFT'" type="info" size="small">草稿</el-tag>
             </div>
             <div class="actions" v-if="userStore.isPropertyManager() || userStore.isSystemAdmin()">
               <el-button size="small" @click="editAnnouncement(item)">编辑</el-button>
@@ -26,10 +27,12 @@
           </div>
         </template>
         <div class="content">
+          <p v-if="item.summary" class="summary">{{ item.summary }}</p>
           <p>{{ item.content }}</p>
         </div>
         <div class="card-footer">
           <span class="publish-info">
+            分类：{{ item.categoryCode || '默认' }} |
             发布人：{{ item.publishUserId ? `用户${item.publishUserId}` : '系统' }} |
             发布时间：{{ formatDate(item.publishTime) }}
           </span>
@@ -43,6 +46,16 @@
         <el-form-item label="标题" prop="title">
           <el-input v-model="announcementForm.title" placeholder="请输入公告标题"></el-input>
         </el-form-item>
+        <el-form-item label="摘要">
+          <el-input v-model="announcementForm.summary" placeholder="请输入摘要"></el-input>
+        </el-form-item>
+        <el-form-item label="分类">
+          <el-select v-model="announcementForm.categoryCode">
+            <el-option label="通知" value="NOTICE"></el-option>
+            <el-option label="停水停电" value="SERVICE"></el-option>
+            <el-option label="社区活动" value="ACTIVITY"></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="内容" prop="content">
           <el-input
             v-model="announcementForm.content"
@@ -53,6 +66,12 @@
         </el-form-item>
         <el-form-item label="是否置顶">
           <el-switch v-model="announcementForm.isTop" :active-value="1" :inactive-value="0"></el-switch>
+        </el-form-item>
+        <el-form-item v-if="userStore.isPropertyManager() || userStore.isSystemAdmin()" label="状态">
+          <el-select v-model="announcementForm.status">
+            <el-option label="已发布" value="PUBLISHED"></el-option>
+            <el-option label="草稿" value="DRAFT"></el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -81,8 +100,11 @@ const formRef = ref()
 const announcementForm = reactive({
   id: null as number | null,
   title: '',
+  summary: '',
   content: '',
-  isTop: 0
+  categoryCode: 'NOTICE',
+  isTop: 0,
+  status: 'PUBLISHED'
 })
 
 const rules = {
@@ -102,8 +124,11 @@ const showAddDialog = () => {
   Object.assign(announcementForm, {
     id: null,
     title: '',
+    summary: '',
     content: '',
-    isTop: 0
+    categoryCode: 'NOTICE',
+    isTop: 0,
+    status: 'PUBLISHED'
   })
   dialogVisible.value = true
 }
@@ -205,6 +230,11 @@ onMounted(() => {
   line-height: 1.6;
 }
 
+.summary {
+  margin-bottom: 8px;
+  color: #64748b;
+}
+
 .card-footer {
   margin-top: 10px;
   color: #999;
@@ -214,5 +244,9 @@ onMounted(() => {
 .no-data {
   text-align: center;
   margin-top: 50px;
+}
+
+.announcement :deep(.el-dialog .el-select) {
+  width: 100%;
 }
 </style>

@@ -37,3 +37,18 @@ export const deleteProperty = (id: number) => {
     method: 'DELETE'
   }).then(res => res.data as ApiResponse<null>)
 }
+
+export const bindPropertyOwner = (data: { propertyId: number; ownerId: number }) => {
+  return request({
+    url: '/property/bind-owner',
+    method: 'PUT',
+    data
+  }).then(res => res.data as ApiResponse<null>)
+}
+
+export const unbindPropertyOwner = (id: number) => {
+  return request({
+    url: `/property/${id}/unbind-owner`,
+    method: 'PUT'
+  }).then(res => res.data as ApiResponse<null>)
+}

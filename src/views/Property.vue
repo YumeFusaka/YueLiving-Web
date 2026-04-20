@@ -12,14 +12,27 @@
       <el-table-column prop="roomNo" label="房号"></el-table-column>
       <el-table-column prop="area" label="面积"></el-table-column>
       <el-table-column prop="ownerId" label="业主ID" v-if="!userStore.isOwner()"></el-table-column>
+      <el-table-column prop="ownerNameSnapshot" label="业主姓名" v-if="!userStore.isOwner()"></el-table-column>
       <el-table-column prop="status" label="状态">
         <template #default="scope">
-          {{ scope.row.status === 1 ? '已入住' : '空置' }}
+          {{ getStatusLabel(scope.row.status) }}
         </template>
       </el-table-column>
       <el-table-column label="操作" v-if="userStore.isPropertyManager() || userStore.isSystemAdmin()">
         <template #default="scope">
           <el-button size="small" @click="editProperty(scope.row)">编辑</el-button>
+          <el-button
+            v-if="!scope.row.ownerId"
+            size="small"
+            type="primary"
+            @click="openBindDialog(scope.row)"
+          >绑定业主</el-button>
+          <el-button
+            v-else
+            size="small"
+            type="warning"
+            @click="unbindOwner(scope.row)"
+          >解绑业主</el-button>
           <el-button size="small" type="danger" @click="deletePropertyItem(scope.row)">删除</el-button>
         </template>
       </el-table-column>
@@ -57,19 +70,35 @@
         </span>
       </template>
     </el-dialog>
+
+    <el-dialog v-model="bindDialogVisible" title="绑定业主" width="420px">
+      <el-form :model="bindForm" label-width="90px">
+        <el-form-item label="房产">
+          <el-input :value="bindForm.displayText" disabled />
+        </el-form-item>
+        <el-form-item label="业主ID">
+          <el-input-number v-model="bindForm.ownerId" :min="1" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="bindDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitBind">确定</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getMyProperties, addProperty, updateProperty, deleteProperty } from '@/apis/property'
+import { getMyProperties, getAllProperties, addProperty, updateProperty, deleteProperty, bindPropertyOwner, unbindPropertyOwner } from '@/apis/property'
 import { useUserStore } from '@/stores/modules/user'
 import type { PropertyItem } from '@/types/models'
 
 const userStore = useUserStore()
 const properties = ref<PropertyItem[]>([])
 const dialogVisible = ref(false)
+const bindDialogVisible = ref(false)
 const isEdit = ref(false)
 const formRef = ref()
 
@@ -83,6 +112,12 @@ const propertyForm = reactive({
   status: 1
 })
 
+const bindForm = reactive({
+  propertyId: null as number | null,
+  ownerId: null as number | null,
+  displayText: ''
+})
+
 const rules = {
   buildingNo: [{ required: true, message: '请输入楼栋号', trigger: 'blur' }],
   unitNo: [{ required: true, message: '请输入单元号', trigger: 'blur' }],
@@ -92,7 +127,7 @@ const rules = {
 }
 
 const loadProperties = async () => {
-  const res = await getMyProperties()
+  const res = userStore.isOwner() ? await getMyProperties() : await getAllProperties()
   if (res.code === 200) {
     properties.value = res.data
   }
@@ -154,6 +189,32 @@ const deletePropertyItem = async (property: PropertyItem) => {
   } catch (error) {
     console.error(error)
   }
+}
+
+const openBindDialog = (property: PropertyItem) => {
+  bindForm.propertyId = property.id
+  bindForm.ownerId = null
+  bindForm.displayText = `${property.buildingNo}-${property.unitNo}-${property.roomNo}`
+  bindDialogVisible.value = true
+}
+
+const submitBind = async () => {
+  if (!bindForm.propertyId || !bindForm.ownerId) return
+  await bindPropertyOwner({ propertyId: bindForm.propertyId, ownerId: bindForm.ownerId })
+  ElMessage.success('绑定成功')
+  bindDialogVisible.value = false
+  loadProperties()
+}
+
+const unbindOwner = async (property: PropertyItem) => {
+  await unbindPropertyOwner(property.id)
+  ElMessage.success('解绑成功')
+  loadProperties()
+}
+
+const getStatusLabel = (status?: number) => {
+  if (status === 2) return '装修中'
+  return status === 1 ? '已入住' : '空置'
 }
 
 onMounted(() => {

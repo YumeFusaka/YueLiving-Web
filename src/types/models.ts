@@ -20,7 +20,9 @@ export interface AnnouncementItem {
   title: string
   summary?: string
   content: string
+  categoryCode?: string
   isTop: number
+  status?: string
   publishUserId?: number | null
   publishTime?: string
 }
@@ -59,6 +61,18 @@ export interface UserItem {
   avatar?: string
   roleId: number
   status: number
+}
+
+export interface OperationLogItem {
+  id: number
+  operatorId: number
+  operatorRoleId: number
+  moduleName: string
+  actionName: string
+  targetType?: string
+  targetId?: number | null
+  content: string
+  createTime?: string
 }
 
 export interface DashboardSummary {

@@ -45,3 +45,11 @@ export const payBill = (id: number) => {
     method: 'POST'
   }).then(res => res.data as ApiResponse<null>)
 }
+
+export const generateBills = (period: string) => {
+  return request({
+    url: '/bill/generate',
+    method: 'POST',
+    data: { period }
+  }).then(res => res.data as ApiResponse<null>)
+}

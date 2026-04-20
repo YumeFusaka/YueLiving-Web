@@ -3,6 +3,7 @@
     <div class="header">
       <h3>{{ pageTitle }}</h3>
       <el-button v-if="userStore.isSystemAdmin() && activeTab === 'users'" type="primary" @click="showAddDialog">添加用户</el-button>
+      <el-button v-if="userStore.isSystemAdmin() && activeTab === 'configs'" type="primary" @click="showAddConfigDialog">新增配置</el-button>
     </div>
     <el-tabs v-if="userStore.isSystemAdmin()" v-model="activeTab" class="page-tabs">
       <el-tab-pane label="管理员管理" name="users"></el-tab-pane>
@@ -40,6 +41,11 @@
       <el-table-column prop="configKey" label="配置键"></el-table-column>
       <el-table-column prop="configValue" label="配置值"></el-table-column>
       <el-table-column prop="remark" label="备注"></el-table-column>
+      <el-table-column label="操作">
+        <template #default="scope">
+          <el-button size="small" @click="editConfig(scope.row)">编辑</el-button>
+        </template>
+      </el-table-column>
     </el-table>
 
     <!-- 添加/编辑用户对话框 -->
@@ -81,6 +87,27 @@
         </span>
       </template>
     </el-dialog>
+
+    <el-dialog v-model="configDialogVisible" title="编辑系统配置" width="520px">
+      <el-form :model="configForm" label-width="90px">
+        <el-form-item label="配置名称">
+          <el-input v-model="configForm.configName" />
+        </el-form-item>
+        <el-form-item label="配置键">
+          <el-input v-model="configForm.configKey" disabled />
+        </el-form-item>
+        <el-form-item label="配置值">
+          <el-input v-model="configForm.configValue" type="textarea" :rows="4" />
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input v-model="configForm.remark" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="configDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitConfig">保存</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -88,7 +115,7 @@
 import { computed, ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getUsers, addUser, updateUser, updateUserStatus, deleteUser } from '@/apis/user'
-import { getSystemConfigs } from '@/apis/config'
+import { getSystemConfigs, saveSystemConfig, updateSystemConfig } from '@/apis/config'
 import { useUserStore } from '@/stores/modules/user'
 import type { SystemConfigItem, UserItem } from '@/types/models'
 
@@ -96,6 +123,7 @@ const userStore = useUserStore()
 const users = ref<UserItem[]>([])
 const configs = ref<SystemConfigItem[]>([])
 const dialogVisible = ref(false)
+const configDialogVisible = ref(false)
 const isEdit = ref(false)
 const formRef = ref()
 const activeTab = ref('users')
@@ -111,6 +139,14 @@ const userForm = reactive({
   email: '',
   roleId: 1,
   status: 1
+})
+
+const configForm = reactive<Partial<SystemConfigItem>>({
+  id: undefined,
+  configKey: '',
+  configName: '',
+  configValue: '',
+  remark: ''
 })
 
 const rules = {
@@ -207,6 +243,34 @@ const toggleStatus = async (user: any) => {
   } catch (error) {
     console.error(error)
   }
+}
+
+const editConfig = (config: SystemConfigItem) => {
+  Object.assign(configForm, config)
+  configDialogVisible.value = true
+}
+
+const showAddConfigDialog = () => {
+  Object.assign(configForm, {
+    id: undefined,
+    configKey: '',
+    configName: '',
+    configValue: '',
+    configType: '',
+    remark: ''
+  })
+  configDialogVisible.value = true
+}
+
+const submitConfig = async () => {
+  if (configForm.id) {
+    await updateSystemConfig(configForm)
+  } else {
+    await saveSystemConfig(configForm)
+  }
+  ElMessage.success('配置已更新')
+  configDialogVisible.value = false
+  loadConfigs()
 }
 
 onMounted(() => {

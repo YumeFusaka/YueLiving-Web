@@ -67,7 +67,7 @@ const router = createRouter({
           path: '/user',
           name: 'User',
           component: () => import('@/views/User.vue'),
-          meta: { requiresAuth: true, roles: [3] } satisfies AppRouteMeta
+          meta: { requiresAuth: true, roles: [2, 3] } satisfies AppRouteMeta
         },
       ]
     }

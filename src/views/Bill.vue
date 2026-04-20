@@ -4,6 +4,7 @@
       <h3>{{ userStore.isOwner() ? '我的账单' : '账单管理' }}</h3>
       <div v-if="userStore.isPropertyManager() || userStore.isSystemAdmin()">
         <el-button type="primary" @click="showAddDialog">添加账单</el-button>
+        <el-button type="success" plain @click="generateBillDialogVisible = true">批量生成物业费</el-button>
       </div>
     </div>
 
@@ -119,13 +120,25 @@
         </span>
       </template>
     </el-dialog>
+
+    <el-dialog v-model="generateBillDialogVisible" title="批量生成物业费账单" width="420px">
+      <el-form label-width="90px">
+        <el-form-item label="账期">
+          <el-input v-model="generatePeriod" placeholder="例如：2026-04"></el-input>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="generateBillDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitGenerateBills">生成</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getMyBills, getAllBills, addBill, updateBill, deleteBill, payBill } from '@/apis/bill'
+import { getMyBills, getAllBills, addBill, updateBill, deleteBill, payBill, generateBills } from '@/apis/bill'
 import { getAllProperties } from '@/apis/property'
 import { useUserStore } from '@/stores/modules/user'
 import type { BillItem, PropertyItem } from '@/types/models'
@@ -134,8 +147,10 @@ const userStore = useUserStore()
 const bills = ref<BillItem[]>([])
 const properties = ref<PropertyItem[]>([])
 const dialogVisible = ref(false)
+const generateBillDialogVisible = ref(false)
 const isEdit = ref(false)
 const formRef = ref()
+const generatePeriod = ref('')
 
 const filterForm = reactive({
   billType: '',
@@ -259,6 +274,13 @@ const payBillItem = async (bill: BillItem) => {
   } catch (error) {
     console.error(error)
   }
+}
+
+const submitGenerateBills = async () => {
+  await generateBills(generatePeriod.value)
+  ElMessage.success('已提交账单生成')
+  generateBillDialogVisible.value = false
+  loadBills()
 }
 
 onMounted(() => {

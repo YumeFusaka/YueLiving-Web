@@ -1,5 +1,5 @@
 import request from '@/utils/axios'
-import type { ApiResponse, UserItem } from '@/types/models'
+import type { ApiResponse, OperationLogItem, UserItem } from '@/types/models'
 
 export const login = (data: { username: string; password: string }) => {
   return request({
@@ -82,4 +82,11 @@ export const getMaintenanceUsers = () => {
     url: '/user/maintenance',
     method: 'GET'
   }).then(res => res.data as ApiResponse<UserItem[]>)
+}
+
+export const getMyLogs = () => {
+  return request({
+    url: '/user/profile/logs',
+    method: 'GET'
+  }).then(res => res.data as ApiResponse<OperationLogItem[]>)
 }
