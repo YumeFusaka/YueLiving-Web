@@ -14,8 +14,11 @@
       <el-form-item label="邮箱" prop="email">
         <el-input v-model="form.email" placeholder="请输入邮箱"></el-input>
       </el-form-item>
-      <el-form-item label="真实姓名" prop="realName">
-        <el-input v-model="form.realName" placeholder="请输入真实姓名"></el-input>
+      <el-form-item label="角色" prop="roleId">
+        <el-select v-model="form.roleId" placeholder="请选择角色">
+          <el-option label="业主" :value="1"></el-option>
+          <el-option label="物业经理" :value="2"></el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="handleRegister" :loading="loading">注册</el-button>
@@ -40,7 +43,8 @@ const form = reactive({
   password: '',
   phone: '',
   email: '',
-  realName: ''
+  realName: '',
+  roleId: 1
 })
 
 const rules = {
@@ -48,7 +52,8 @@ const rules = {
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
   phone: [{ required: true, message: '请输入手机号', trigger: 'blur' }],
   email: [{ required: true, message: '请输入邮箱', trigger: 'blur' }],
-  realName: [{ required: true, message: '请输入真实姓名', trigger: 'blur' }]
+  realName: [{ required: true, message: '请输入真实姓名', trigger: 'blur' }],
+  roleId: [{ required: true, message: '请选择角色', trigger: 'change' }]
 }
 
 const handleRegister = async () => {

@@ -7,6 +7,13 @@ export const getMyProperties = () => {
   }).then(res => res.data)
 }
 
+export const getAllProperties = () => {
+  return request({
+    url: '/property',
+    method: 'GET'
+  }).then(res => res.data)
+}
+
 export const addProperty = (data: any) => {
   return request({
     url: '/property',

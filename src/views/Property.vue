@@ -20,7 +20,7 @@
       <el-table-column label="操作" v-if="userStore.isPropertyManager() || userStore.isSystemAdmin()">
         <template #default="scope">
           <el-button size="small" @click="editProperty(scope.row)">编辑</el-button>
-          <el-button size="small" type="danger" @click="deleteProperty(scope.row)">删除</el-button>
+          <el-button size="small" type="danger" @click="deletePropertyItem(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>

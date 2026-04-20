@@ -28,9 +28,13 @@
               <el-icon><Bell /></el-icon>
               <span>公告管理</span>
             </el-menu-item>
+            <el-menu-item v-if="userStore.isSystemAdmin()" index="/user">
+              <el-icon><User /></el-icon>
+              <span>用户管理</span>
+            </el-menu-item>
             <!-- 所有登录用户可见 -->
             <el-menu-item index="/profile">
-              <el-icon><User /></el-icon>
+              <el-icon><Avatar /></el-icon>
               <span>个人中心</span>
             </el-menu-item>
           </el-menu>
@@ -45,7 +49,7 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { House, Money, Tools, Bell, User } from '@element-plus/icons-vue'
+import { House, Money, Tools, Bell, User, Avatar } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/modules/user'
 
 const router = useRouter()

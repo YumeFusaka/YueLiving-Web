@@ -51,7 +51,13 @@ const router = createRouter({
           name: 'Profile',
           component: () => import('@/views/Profile.vue'),
           meta: { requiresAuth: true }
-        }
+        },
+        {
+          path: '/user',
+          name: 'User',
+          component: () => import('@/views/User.vue'),
+          meta: { requiresAuth: true }
+        },
       ]
     }
   ],
@@ -63,6 +69,8 @@ router.beforeEach((to, from, next) => {
 
   if (to.meta.requiresAuth && !userStore.isLoggedIn()) {
     next('/login')
+  } else if (to.path === '/user' && !userStore.isSystemAdmin()) {
+    next('/')
   } else {
     next()
   }

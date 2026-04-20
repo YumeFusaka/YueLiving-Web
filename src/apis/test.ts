@@ -9,7 +9,7 @@ export const login = (data: { username: string; password: string }) => {
   }).then(res => res.data)
 }
 
-export const register = (data: { username: string; password: string; phone: string; email: string; realName: string }) => {
+export const register = (data: { username: string; password: string; phone: string; email: string; realName: string; roleId: number }) => {
   return request({
     url: '/user/register',
     method: 'POST',
