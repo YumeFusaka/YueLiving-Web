@@ -58,6 +58,12 @@ const router = createRouter({
           meta: { requiresAuth: true } satisfies AppRouteMeta
         },
         {
+          path: '/ai-assistant',
+          name: 'AiAssistant',
+          component: () => import('@/views/AiAssistant.vue'),
+          meta: { requiresAuth: true, roles: [1] } satisfies AppRouteMeta
+        },
+        {
           path: '/operation-logs',
           name: 'OperationLogs',
           component: () => import('@/views/OperationLogs.vue'),

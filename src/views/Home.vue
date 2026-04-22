@@ -38,7 +38,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { House, Money, Tools, Bell, User, Avatar, UserFilled } from '@element-plus/icons-vue'
+import { House, Money, Tools, Bell, User, Avatar, UserFilled, ChatDotRound } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/modules/user'
 
 const router = useRouter()
@@ -56,6 +56,7 @@ const ownerMenu: MenuItem[] = [
   { path: '/bill', label: '费用中心', icon: Money },
   { path: '/repair', label: '在线报修', icon: Tools },
   { path: '/announcement', label: '公告通知', icon: Bell },
+  { path: '/ai-assistant', label: '智能客服', icon: ChatDotRound },
   { path: '/profile', label: '个人中心', icon: Avatar }
 ]
 

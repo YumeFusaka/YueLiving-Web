@@ -91,3 +91,8 @@ export interface SystemConfigItem {
   configType?: string
   remark?: string
 }
+
+export interface AiChatItem {
+  category: string
+  answer: string
+}
